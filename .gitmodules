@@ -1,0 +1,3 @@
+[submodule "lib/configdevenv"]
+	path = lib/configdevenv
+	url = git@github.com:xingmin/configdevenv.git
