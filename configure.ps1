@@ -30,3 +30,6 @@ if ($m0 -ne $null){
 	}
 	Write-Host -NoNewline "OK."
 }
+
+Write-Host "禁用屏幕保护程序(系统重启后生效):OK"
+Set-ItemProperty -Path "Registry::HKEY_CURRENT_USER\Control Panel\Desktop" -Name "ScreenSaveActive" -Value 0
