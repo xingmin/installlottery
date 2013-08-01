@@ -30,7 +30,7 @@ if ($m0 -ne $null){
 		powercfg /change "$powerstyle"  /hibernate-timeout-ac 0 
 		powercfg /change "$powerstyle"  /hibernate-timeout-dc 0 
 	}
-	Write-Host -NoNewline "OK."
+	Write-Host  "OK."
 }
 
 #禁用屏保
@@ -43,8 +43,10 @@ $ver = $version.split(".")
 $v = [int]$ver[0]*10000000+[int]$ver[1]*100000+[int]$ver[2]
 [int]$vsp3 = 50102600
 if (([int]$ver[0] -eq 5) -and ($v -lt $vsp3)){
+	Write-Host "安装SP3:"
 	#如果xp版本低于sp3将安装sp3补丁
-	Write-Host "xxx"
+	Start-Process -Wait -FilePath "./WindowsXP-KB936929-SP3-x86-CHS.exe" 
+	Write-Host "OK"
 }else{
 	Write-Host "操作系统版本高于XPSP3"
 }
@@ -55,3 +57,18 @@ if ($monitors.count -ge 2){
 	Set-Display -Mode extend
 	Set-ScreenResolution -Width 1024 -Height 768 
 }
+
+#卸载IDS
+#检查IDS是否已经安装
+
+$ids=Get-Process -Name "IDS" 
+#删除IDS服务
+$service  = Get-WmiObject -Class Win32_Service -Filter "Name like 'IDS%'" 
+if($service){
+	$service.Delete()
+}
+
+#卸载IDS
+
+
+
