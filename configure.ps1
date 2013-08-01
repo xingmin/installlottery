@@ -1,3 +1,7 @@
+Push-Location
+$curpwd = Split-Path -Parent $MyInvocation.MyCommand.Definition
+Set-Location -Path $curpwd
+
 . .\functions.ps1
 #设置电源管理
 Write-Host -NoNewline "设置电源管理为[一直开着]:"
@@ -45,7 +49,12 @@ $v = [int]$ver[0]*10000000+[int]$ver[1]*100000+[int]$ver[2]
 if (([int]$ver[0] -eq 5) -and ($v -lt $vsp3)){
 	Write-Host "安装SP3:"
 	#如果xp版本低于sp3将安装sp3补丁
-	Start-Process -Wait -FilePath "./WindowsXP-KB936929-SP3-x86-CHS.exe" 
+	if (-not (Test-Path -Path "./sp3/WindowsXP-KB936929-SP3-x86-CHS.exe")){
+		$curpwd_linux = (Resolve-Path $curpwd).Path 
+		$curpwd_linux = $curpwd_linux -replace '\\','/'
+		& C:\xingmin\git\bin\sh.exe --login -c "cd $curpwd_linux;cat ./sp3/WindowsXP-KB936929-SP3-x86-CHS.exea* > ./sp3/WindowsXP-KB936929-SP3-x86-CHS.exe"
+	}
+	Start-Process -Wait -FilePath "./sp3/WindowsXP-KB936929-SP3-x86-CHS.exe" 
 	Write-Host "OK"
 }else{
 	Write-Host "操作系统版本高于XPSP3"
@@ -70,5 +79,5 @@ if($service){
 
 #卸载IDS
 
-
+Pop-Location
 
