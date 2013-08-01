@@ -62,7 +62,9 @@ if (([int]$ver[0] -eq 5) -and ($v -lt $vsp3)){
 
 #设置扩展到第二块屏幕，并设置屏幕分辨率为1024*768
 $monitors= Get-WmiObject -Namespace root\wmi -class WmiMonitorID
+Write-Host "检测到屏幕数量:$monitors"
 if ($monitors.count -ge 2){
+	Write-Host "设置显示器为:扩展模式."
 	Set-Display -Mode extend
 	Set-ScreenResolution -Width 1024 -Height 768 
 }
@@ -70,12 +72,12 @@ if ($monitors.count -ge 2){
 #卸载IDS
 #检查IDS是否已经安装
 
-$ids=Get-Process -Name "IDS" 
-#删除IDS服务
-$service  = Get-WmiObject -Class Win32_Service -Filter "Name like 'IDS%'" 
-if($service){
-	$service.Delete()
-}
+#$ids=Get-Process -Name "IDS" 
+##删除IDS服务
+#$service  = Get-WmiObject -Class Win32_Service -Filter "Name like 'IDS%'" 
+#if($service){
+#	$service.Delete()
+#}
 
 #卸载IDS
 
