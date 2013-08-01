@@ -42,6 +42,7 @@ Write-Host "禁用屏幕保护程序(系统重启后生效):OK"
 Set-ItemProperty -Path "Registry::HKEY_CURRENT_USER\Control Panel\Desktop" -Name "ScreenSaveActive" -Value 0
 
 #安装sp3补丁
+Write-Host "检查操作系统版本:"
 $version = Get-WmiObject -Class Win32_OperatingSystem |  select-object -expandproperty version
 $ver = $version.split(".")
 $v = [int]$ver[0]*10000000+[int]$ver[1]*100000+[int]$ver[2]
