@@ -1,3 +1,4 @@
+. .\functions.ps1
 #设置电源管理
 Write-Host -NoNewline "设置电源管理为[一直开着]:"
 $powerstyle = "一直开着"
@@ -31,6 +32,7 @@ if ($m0 -ne $null){
 	}
 	Write-Host -NoNewline "OK."
 }
+
 #禁用屏保
 Write-Host "禁用屏幕保护程序(系统重启后生效):OK"
 Set-ItemProperty -Path "Registry::HKEY_CURRENT_USER\Control Panel\Desktop" -Name "ScreenSaveActive" -Value 0
@@ -45,4 +47,11 @@ if (([int]$ver[0] -eq 5) -and ($v -lt $vsp3)){
 	Write-Host "xxx"
 }else{
 	Write-Host "操作系统版本高于XPSP3"
+}
+
+#设置扩展到第二块屏幕，并设置屏幕分辨率为1024*768
+$monitors= Get-WmiObject -Namespace root\wmi -class WmiMonitorID
+if ($monitors.count -ge 2){
+	Set-Display -Mode extend
+	Set-ScreenResolution -Width 1024 -Height 768 
 }
