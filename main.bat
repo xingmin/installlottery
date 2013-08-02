@@ -13,10 +13,10 @@ if not exist ".\lib\configdevenv\reboot.txt" goto next1
 del ".\lib\configdevenv\reboot.txt"
 SCHTASKS /create /tn configbasicdevenv /tr "%~dp0\main.bat" /sc ONSTART
 shutdown /r /f /t 0
+exit
 
-next1:
-
+:next1
+powershell -command "& {.\configure.ps1}"
 start .\deltask.bat
-
 popd
 exit
