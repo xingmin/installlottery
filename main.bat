@@ -11,12 +11,12 @@ call .\lib\configdevenv\autoinstall.bat
 if not exist ".\lib\configdevenv\reboot.txt" goto next1
 
 del ".\lib\configdevenv\reboot.txt"
-SCHTASKS /create /tn configbasicdevenv /tr "%~dp0\main.bat" /sc ONSTART
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v basicdevenv /t reg_sz /d "%~dp0main.bat" /f
 shutdown /r /f /t 0
 exit
 
 :next1
 powershell -command "& {.\configure.ps1}"
-start .\deltask.bat
+call .\deltask.bat
 popd
 exit
