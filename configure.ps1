@@ -45,6 +45,7 @@ Set-ItemProperty -Path "Registry::HKEY_CURRENT_USER\Control Panel\Desktop" -Name
 Write-Host "检查操作系统版本:"
 $version = Get-WmiObject -Class Win32_OperatingSystem |  select-object -expandproperty version
 $ver = $version.split(".")
+$major = [int]$ver[0];
 $v = [int]$ver[0]*10000000+[int]$ver[1]*100000+[int]$ver[2]
 [int]$vsp3 = 50102600
 if (([int]$ver[0] -eq 5) -and ($v -lt $vsp3)){
@@ -62,13 +63,24 @@ if (([int]$ver[0] -eq 5) -and ($v -lt $vsp3)){
 }
 
 #设置扩展到第二块屏幕，并设置屏幕分辨率为1024*768
-$monitors= Get-WmiObject -Namespace root\wmi -class WmiMonitorID
-Write-Host "检测到屏幕数量:$monitors"
-if ($monitors.count -ge 2){
-	Write-Host "设置显示器为:扩展模式."
-	Set-Display -Mode extend
-	Set-ScreenResolution -Width 1024 -Height 768 
+if ($major -ge 6){
+	$monitors = Get-WmiObject -Class Win32_PnPEntity | Where-Object{$_.DeviceId -match "^DISPLAY"}
+	if (($monitors.GetType() -eq [Object[]]) -and ($monitors.count -ge 2)){
+		$msg = "检测到屏幕数量:"  -f $monitors.count;
+	}else{
+		Write-Host "检测到屏幕数量:1,不执行扩展桌面操作";
+	}
+}else{
+	$monitors= Get-WmiObject -Namespace root\wmi -class WmiMonitorID	
+	$msg = "检测到屏幕数量:"  -f $monitors.count;
+	Write-Host $msg
+	if ($monitors.count -ge 2){
+		Write-Host "设置显示器为:扩展模式."
+		Set-Display -Mode extend
+		Set-ScreenResolution -Width 1024 -Height 768 
+	}
 }
+
 
 #卸载IDS
 #检查IDS是否已经安装
