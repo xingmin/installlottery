@@ -6,6 +6,7 @@ import win32con
 import time
 import struct  
 import os
+import array
 
 class extenddisplay:
     #取得主窗口的句柄
@@ -24,11 +25,16 @@ class extenddisplay:
     #获得combox中的列表文本数组
     def getComboboxItems(self, hwnd):
         result = []
-        bufferlength = struct.pack('i', 255)
+        bufferlength = struct.pack('i', 255)        
         itemCount = win32gui.SendMessage(hwnd, win32con.CB_GETCOUNT, 0, 0)
         for itemIndex in range(itemCount):
-            linetext = bufferlength + b"".ljust(253)
+            #linetext = bufferlength + b"".ljust(253)
+            linetext = array.array('u', str(bufferlength) + str().ljust(253))
+            #linetext = win32gui.PyMakeBuffer(1024)
+            #linelength = win32gui.SendMessage(hwnd, win32con.CB_GETLBTEXT, itemIndex, linetext)
             linelength = win32gui.SendMessage(hwnd, win32con.CB_GETLBTEXT, itemIndex, linetext)
+            print(linetext[:linelength])
+            #print(linetext)            
             result.append(linetext[:linelength])
         return result
     def setCheckButton(self, hwnd):
@@ -63,7 +69,7 @@ class extenddisplay:
         return len(cbxitems);
 if __name__ == "__main__":
     #os.execl("cmd.exe rundll32.exe shell32.dll,Control_RunDLL desk.cpl,,3");
-    os.popen("cmd.exe rundll32.exe shell32.dll,Control_RunDLL desk.cpl,,3");
+    #os.popen("cmd.exe rundll32.exe shell32.dll,Control_RunDLL desk.cpl,,3");
     ed = extenddisplay();
     monitors = ed.extendMonitor();
     print("显示器数目:", monitors);
