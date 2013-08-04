@@ -64,22 +64,23 @@ if (([int]$ver[0] -eq 5) -and ($v -lt $vsp3)){
 
 #设置扩展到第二块屏幕，并设置屏幕分辨率为1024*768
 if ($major -ge 6){
-	$monitors = Get-WmiObject -Class Win32_PnPEntity | Where-Object{$_.DeviceId -match "^DISPLAY"}
-	if (($monitors.GetType() -eq [Object[]]) -and ($monitors.count -ge 2)){
-		$msg = "检测到屏幕数量:"  -f $monitors.count;
-	}else{
-		Write-Host "检测到屏幕数量:1,不执行扩展桌面操作";
-	}
+	$monitors= Get-WmiObject -Namespace root\wmi -class WmiMonitorID
 }else{
-	$monitors= Get-WmiObject -Namespace root\wmi -class WmiMonitorID	
+	$monitors = Get-WmiObject -Class Win32_PnPEntity | Where-Object{$_.DeviceId -match "^DISPLAY"}
+}
+if (($monitors.GetType() -eq [Object[]]) -and ($monitors.count -ge 2)){
 	$msg = "检测到屏幕数量:"  -f $monitors.count;
 	Write-Host $msg
-	if ($monitors.count -ge 2){
-		Write-Host "设置显示器为:扩展模式."
+	Write-Host "设置显示器为:扩展模式."
+	if ($major -ge 6){
 		Set-Display -Mode extend
-		Set-ScreenResolution -Width 1024 -Height 768 
+	}else{
 	}
-}
+	Set-ScreenResolution -Width 1024 -Height 768 
+}else{
+		Write-Host "检测到屏幕数量:1,不执行扩展桌面操作";
+	}		
+
 
 
 #卸载IDS
