@@ -5,45 +5,48 @@ import win32gui
 import win32con
 import time
 import struct  
-
+import os
 
 class extenddisplay:
-    def __init__(self):
-        #取得主窗口的句柄
+    #取得主窗口的句柄
     def initWin(self):
         for i in range(1,1000):
             self.winhandle = win32gui.FindWindow(None,"显示 属性");
             if self.winhandle ==0:
-                print("Not found the window of [Display Property]")
+                print(i,"Not found the window of [Display Property]")
                 continue;
             print("Window founded.")
             self.winConfig = win32gui.FindWindowEx(self.winhandle, None, None, "设置 ")
-            time.sleep(1);            
-        if i>1000:
-            return False;
-        return True;
+            time.sleep(1);
+            return True;
+        return False;
+
     #获得combox中的列表文本数组
     def getComboboxItems(self, hwnd):
         result = []
         bufferlength = struct.pack('i', 255)
         itemCount = win32gui.SendMessage(hwnd, win32con.CB_GETCOUNT, 0, 0)
         for itemIndex in range(itemCount):
-            linetext = bufferlength + "".ljust(253)
+            linetext = bufferlength + b"".ljust(253)
             linelength = win32gui.SendMessage(hwnd, win32con.CB_GETLBTEXT, itemIndex, linetext)
             result.append(linetext[:linelength])
         return result
     def setCheckButton(self, hwnd):
         win32gui.SendMessage(hwnd, win32con.BM_SETCHECK, None, None);
+    def clickbtn(self, hwnd, txt):
+        btn = win32gui.FindWindowEx(hwnd, 0, "Button", txt);
+        win32gui.SendMessage(btn, win32con.BM_CLICK, None, -1);
     #扩展屏幕操作
     def extendMonitor(self):
         if not self.initWin():
             return 0;
         lblDisplay = win32gui.FindWindowEx(self.winConfig, 0, "Static", "显示:");
         #找到combox of 显示器列表
-        self.cbxDisplay = win32api.GetWindow(lblDisplay, win32con.GW_HWNDNEXT);
-        cbxitems = self.getComboboxItems(cbxDisplay);
+        self.cbxDisplay = win32gui.GetWindow(lblDisplay, win32con.GW_HWNDNEXT);
+        cbxitems = self.getComboboxItems(self.cbxDisplay);
+        print(cbxitems);
         if len(cbxitems)<=1:
-            self.clickbtn("Button", "取消");
+            self.clickbtn(self.winhandle,"取消");
             return 1;
         #两个及以上显示器，需要设置为扩展
         self.btnMainMonitor = win32gui.FindWindowEx(self.winConfig, 0, "Button", "使用该设备作为主监视器");
@@ -55,10 +58,12 @@ class extenddisplay:
                 self.setCheckButton(self.btnMainMonitor);
             else:
                 setCheckButton(self.btnExtend);
-        self.clickbtn("Button", "应用(&A)");
-        self.clickbtn("Button", "确定");
+        self.clickbtn(self.winhandle,"应用(&A)");
+        self.clickbtn(self.winhandle,"确定");
         return len(cbxitems);
 if __name__ == "__main__":
+    #os.execl("cmd.exe rundll32.exe shell32.dll,Control_RunDLL desk.cpl,,3");
+    os.popen("cmd.exe rundll32.exe shell32.dll,Control_RunDLL desk.cpl,,3");
     ed = extenddisplay();
     monitors = ed.extendMonitor();
     print("显示器数目:", monitors);
