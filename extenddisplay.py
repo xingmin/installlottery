@@ -31,22 +31,28 @@ class extenddisplay:
             #linetext = bufferlength + b"".ljust(253)
             linetext = array.array('u', str(bufferlength) + str().ljust(253))
             linelength = win32gui.SendMessage(hwnd, win32con.CB_GETLBTEXT, itemIndex, linetext)       
-            result.append(linetext[:linelength]).tounicode())
-        return result
+            result.append((linetext[:linelength]).tounicode())
+        return result;
     def setCheckButton(self, hwnd):
         win32gui.SendMessage(hwnd, win32con.BM_SETCHECK, None, None);
     def clickbtn(self, hwnd, txt):
         btn = win32gui.FindWindowEx(hwnd, 0, "Button", txt);
-        win32gui.SendMessage(btn, win32con.BM_CLICK, None, -1);
+        if 0 != btn:
+            win32gui.SendMessage(btn, win32con.BM_CLICK, None, -1);
+    def identifyDisplay(self):
+        self.clickbtn(self.winConfig, "识别(&I)");
+        time.sleep(2);
+
     #扩展屏幕操作
     def extendMonitor(self):
         if not self.initWin():
             return 0;
+        self.identifyDisplay();
         lblDisplay = win32gui.FindWindowEx(self.winConfig, 0, "Static", "显示:");
         #找到combox of 显示器列表
         self.cbxDisplay = win32gui.GetWindow(lblDisplay, win32con.GW_HWNDNEXT);
         cbxitems = self.getComboboxItems(self.cbxDisplay);
-        print(cbxitems);
+        #print(cbxitems);
         if len(cbxitems)<=1:
             self.clickbtn(self.winhandle,"取消");
             return 1;
@@ -56,11 +62,13 @@ class extenddisplay:
 
         for i in range(len(cbxitems)):
             win32gui.SendMessage(self.cbxDisplay, win32con.CB_SETCURSEL, i,0);
+            time.sleep(1);
             if i<=0:
                 self.setCheckButton(self.btnMainMonitor);
             else:
                 setCheckButton(self.btnExtend);
         self.clickbtn(self.winhandle,"应用(&A)");
+        time.sleep(1);
         self.clickbtn(self.winhandle,"确定");
         return len(cbxitems);
 if __name__ == "__main__":
