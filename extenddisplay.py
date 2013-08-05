@@ -16,7 +16,7 @@ class extenddisplay:
             if self.winhandle ==0:
                 print(i,"Not found the window of [Display Property]")
                 continue;
-            print("Window founded.")
+            #print("Window founded.")
             self.winConfig = win32gui.FindWindowEx(self.winhandle, None, None, "设置 ")
             time.sleep(1);
             return True;
@@ -46,7 +46,9 @@ class extenddisplay:
     #扩展屏幕操作
     def extendMonitor(self):
         if not self.initWin():
+            print("无法找到窗口句柄.")
             return 0;
+        print("开始设置扩展屏幕...");
         self.identifyDisplay();
         lblDisplay = win32gui.FindWindowEx(self.winConfig, 0, "Static", "显示:");
         #找到combox of 显示器列表
@@ -70,6 +72,7 @@ class extenddisplay:
         self.clickbtn(self.winhandle,"应用(&A)");
         time.sleep(1);
         self.clickbtn(self.winhandle,"确定");
+
         return len(cbxitems);
 if __name__ == "__main__":
     #os.execl("cmd.exe rundll32.exe shell32.dll,Control_RunDLL desk.cpl,,3");
@@ -77,3 +80,4 @@ if __name__ == "__main__":
     ed = extenddisplay();
     monitors = ed.extendMonitor();
     print("显示器数目:", monitors);
+    print("显示设置完毕.")    
