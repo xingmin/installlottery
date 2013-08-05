@@ -30,12 +30,8 @@ class extenddisplay:
         for itemIndex in range(itemCount):
             #linetext = bufferlength + b"".ljust(253)
             linetext = array.array('u', str(bufferlength) + str().ljust(253))
-            #linetext = win32gui.PyMakeBuffer(1024)
-            #linelength = win32gui.SendMessage(hwnd, win32con.CB_GETLBTEXT, itemIndex, linetext)
-            linelength = win32gui.SendMessage(hwnd, win32con.CB_GETLBTEXT, itemIndex, linetext)
-            print(linetext[:linelength])
-            #print(linetext)            
-            result.append(linetext[:linelength])
+            linelength = win32gui.SendMessage(hwnd, win32con.CB_GETLBTEXT, itemIndex, linetext)       
+            result.append(linetext[:linelength]).tounicode())
         return result
     def setCheckButton(self, hwnd):
         win32gui.SendMessage(hwnd, win32con.BM_SETCHECK, None, None);
