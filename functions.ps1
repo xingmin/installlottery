@@ -184,3 +184,66 @@ namespace Resolution
 Add-Type $pinvokeCode -ErrorAction SilentlyContinue 
 [Resolution.PrmaryScreenResolution]::ChangeResolution($width,$height) 
 } 
+
+
+function get-osversion{
+	$version = Get-WmiObject -Class Win32_OperatingSystem |  select-object -expandproperty version
+	$ver = $version.split(".")
+	return [int[]]$ver;
+}
+function get-osversionmajor{
+	return (get-osversion)[0];
+}
+
+#This function are modified from http://gallery.technet.microsoft.com/scriptcenter/e4cdcc2c-185a-43d7-9b44-3de15ba7bf34
+function get-alluninstall{
+	param ( 
+	[Parameter(Position = 0)] 
+	[string] 
+	$computername)
+	if (-not $computername) {
+		$computername = $env:COMPUTERNAME;
+	}
+	$array = @()
+	# Branch of the Registry  
+	$Branch='LocalMachine'  
+	 
+	# Main Sub Branch you need to open  
+	$SubBranch="SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"  
+	 
+	$registry=[microsoft.win32.registrykey]::OpenRemoteBaseKey('Localmachine',$computername)  
+	$registrykey=$registry.OpenSubKey($Subbranch)  
+	$SubKeys=$registrykey.GetSubKeyNames()  
+	 
+	# Drill through each key from the list and pull out the value of  
+	# “DisplayName” – Write to the Host console the name of the computer  
+	# with the application beside it 
+	 
+	Foreach ($key in $subkeys)  
+	{  
+	    $exactkey=$key  
+	    $NewSubKey=$SubBranch+"\\"+$exactkey  
+	    $ReadUninstall=$registry.OpenSubKey($NewSubKey)  
+		
+		$obj = New-Object PSObject
+
+        $obj | Add-Member -MemberType NoteProperty -Name "ComputerName" -Value $computername
+
+        $obj | Add-Member -MemberType NoteProperty -Name "DisplayName" -Value $($ReadUninstall.GetValue("DisplayName"))
+
+        $obj | Add-Member -MemberType NoteProperty -Name "DisplayVersion" -Value $($ReadUninstall.GetValue("DisplayVersion"))
+
+        $obj | Add-Member -MemberType NoteProperty -Name "InstallLocation" -Value $($ReadUninstall.GetValue("InstallLocation"))
+
+        $obj | Add-Member -MemberType NoteProperty -Name "Publisher" -Value $($ReadUninstall.GetValue("Publisher"))
+
+        $array += $obj
+	 
+	}  
+	if ($array.count -gt 0){
+		return $array;
+	}else {
+		return $null;
+	}
+	#$array | Where-Object { $_.DisplayName } | select ComputerName, DisplayName, DisplayVersion, Publisher | ft -auto
+}
