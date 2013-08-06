@@ -59,5 +59,9 @@ if ($vcredist -eq $null){
 	Write-Host "exist.";
 }
 
+#安装codec
+& .\installcodec.ps1
+
+& .\installmids.ps1
 
 Pop-Location
