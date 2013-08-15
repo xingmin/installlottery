@@ -5,7 +5,7 @@ pushd %cd%
 cd /d %~dp0
 
 #run this program needs the network working. In other words, ping the world are OK. 
-ping -n 4 www.baidu.com > null
+ping -n 4 www.baidu.com >nul 2>&1 
 if errorlevel 1 goto EOF
 
 @echo off
@@ -15,7 +15,7 @@ call .\lib\configdevenv\autoinstall.bat
 if not exist ".\lib\configdevenv\reboot.txt" goto next1
 
 del ".\lib\configdevenv\reboot.txt"
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v basicdevenv /t reg_sz /d "%~dp0main.bat" /f
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v basicdevenv /t reg_sz /d "%~dp0main.bat" /f >nul 2>&1 
 shutdown /r /f /t 0
 exit /b 0
 
